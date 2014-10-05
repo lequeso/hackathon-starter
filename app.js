@@ -215,6 +215,21 @@ app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '
 
 app.use(errorHandler());
 
+
+
+/**
+ * Scheduler.
+ */
+var schedule = require('node-schedule');
+
+var rule = new schedule.RecurrenceRule();
+rule.minute =  new schedule.Range(0,5,10,15,20,25,30,35,40,45,50,55);
+
+var j = schedule.scheduleJob(rule, function(){
+    console.log('The answer to life, the universe, and everything!');
+});
+
+
 /**
  * Start Express server.
  */
