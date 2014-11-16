@@ -1,0 +1,43 @@
+extends ../layout
+
+block content
+  .row
+    .col-xs-6
+      form(action='/trade/items', method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        legend Stock
+        .form-group
+          label Type
+          input.form-control(type='text', name='type', placeholder='Sell / Buy')
+        .form-group
+          label Name
+          input.form-control(type='text', name='name')
+          button.btn.btn-success(type='submit')
+            i.fa.fa-tag
+            |  Process
+
+  h3 Open Orders (Market is close)
+  if !items.length
+    .alert.alert-warning
+      p No orders have been added yet
+  else
+    table.table.table-striped.table-bordered
+      thead
+          tr
+            th Stock Name
+            th Type
+            th Action
+      tbody
+        for item in items
+          tr
+            td
+              a(href='#', class='editable', data-name='item', data-type='text', data-pk='#{item.id}', data-url='/trade', data-title='Update Item') #{item.name}
+            td= item.itemType
+            td.col-xs-1.text-center
+              form(action='/trade/items/delete', method='POST')
+                input(type='hidden', name='_csrf', value=_csrf)
+                input(type='hidden', name='_id', value=item._id)
+                button.btn.btn-danger(type='submit')
+                  span.ion-trash-b
+                  | Delete Order
+              //a.text-danger(href='#', class='delete', data-name='item', data-id='#{item.id}') Delete

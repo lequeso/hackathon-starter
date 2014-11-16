@@ -106,6 +106,15 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
+
+
+var Item = mongoose.model('Item', {
+  name: String,
+  itemType: String
+});
+
+
+
 /**
  * Main routes.
  */
@@ -128,6 +137,57 @@ app.post('/account/password', passportConf.isAuthenticated, userController.postU
 app.post('/account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
 
+
+/**
+ * Trade Dashboard
+ */
+app.get('/dashboard', function(req, res) {
+  Item.find(function(err, items) {
+      res.render('trade/dashboard', {
+        items: items,
+        user: req.user
+      });
+  });
+});
+/**
+ * Trade
+ */
+app.get('/trade', function(req, res) {
+  Item.find(function(err, items) {
+      res.render('trade/trade', {
+        items: items,
+        user: req.user
+      });
+  });
+});
+
+
+// Create a new item
+app.post('/trade/items', function(req, res) {
+  var item = new Item({
+    itemType: req.body.type,
+    name: req.body.name
+  });
+  item.save(function(err) {
+    res.redirect('/trade');
+  });
+});
+// Delete item
+app.post('/trade/items/delete', function(req, res, next) {
+  Item.remove({ _id: req.body._id }, function(err) {
+    if (err) return next(err);
+    req.flash('info', { msg: 'Your order has been deleted.' });
+    res.redirect('/trade');
+  });
+});
+// Update an item
+app.put('/trade', function(req, res) {
+if (req.body.name === 'item') {
+    Item.update({ _id: req.body.pk }, { $set: { name: req.body.value } }, function() {
+      res.send(200);
+    });
+  }
+});
 /**
  * API examples routes.
  */
@@ -212,7 +272,7 @@ app.use(errorHandler());
 
 /**
  * Scheduler.
- */
+
 var schedule = require('node-schedule');
 
 var rule = new schedule.RecurrenceRule();
@@ -221,7 +281,7 @@ rule.minute =  new schedule.Range(0,5,10,15,20,25,30,35,40,45,50,55);
 var j = schedule.scheduleJob(rule, function(){
     console.log('The answer to life, the universe, and everything!');
 });
-
+ */
 
 /**
  * Start Express server.
