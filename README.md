@@ -4,7 +4,7 @@ Hackathon Starter [![Dependency Status](https://david-dm.org/sahat/hackathon-sta
 
 :octocat: &nbsp;**Live Demo**: http://hackathonstarter.herokuapp.com 
 
-Jump to [What's new in 2.3.4?](#changelog)
+Jump to [What's new in 2.4.0?](#changelog)
 
 A boilerplate for **Node.js** web applications.
 
@@ -243,7 +243,7 @@ The same goes for other providers.
 <hr>
 
 <img src="https://stripe.com/img/about/logos/logos/black@2x.png" width="200">
-- [Sign up](http://stripe.com) or log into your your [dashboard](https://manage.stripe.com)
+- [Sign up](http://stripe.com) or log into your [dashboard](https://manage.stripe.com)
 - Click on your profile and click on Account Settings
 - Then click on [API Keys](https://manage.stripe.com/account/apikeys)
 - Copy the **Secret Key**. and add this into `config/secrets.js`
@@ -271,7 +271,7 @@ The same goes for other providers.
 
 <hr>
 
-<img src="http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png" width="200">
+<img src="http://img4.wikia.nocookie.net/__cb20130520163346/logopedia/images/8/8d/Tumblr_logo_by_x_1337_x-d5ikwpp.png" width="200">
 - Go to http://www.tumblr.com/oauth/apps
 - Once signed in, click **+Register application**
 - Fill in all the details
@@ -281,7 +281,7 @@ The same goes for other providers.
 
 <hr>
 
-<img src="http://www.outofoursystem.com/wp-content/uploads/2012/06/steam-logo-white.jpg" width="200">
+<img src="http://www.technologytell.com/gaming/files/2012/01/steam_logo.jpg" width="200">
 - Go to http://steamcommunity.com/dev/apikey
 - Sign in with your existing Steam account
 - Enter your *Domain Name*, then and click **Register**
@@ -291,7 +291,7 @@ The same goes for other providers.
 
 <img src="http://iandouglas.com/presentations/pyconca2012/logos/sendgrid_logo.png" width="200">
 - Go to https://sendgrid.com/user/signup
-- Sign up and **confirm** your your account via the *activation email*
+- Sign up and **confirm** your account via the *activation email*
 - Then enter your SendGrid *Username* and *Password* into `config/secrets.js`
 
 <hr>
@@ -1195,6 +1195,12 @@ Also, be sure to check out the [Jump-start your hackathon efforts with DevOps Se
 
 Changelog
 ---------
+
+### 2.4.0 (November 8, 2014)
+- Bootstrap 3.3.0.
+- Flatly 3.3.0 theme.
+- User model cleanup.
+- Removed `helperContext` from connect-assets middleware.
 
 ### 2.3.4 (October 27, 2014)
 - Font Awesome 4.2.0 [01e7bd5c09926911ca856fe4990e6067d9148694](https://github.com/sahat/hackathon-starter/commit/01e7bd5c09926911ca856fe4990e6067d9148694)
