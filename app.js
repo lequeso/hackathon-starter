@@ -1,7 +1,6 @@
 /**
  * Module dependencies.
  */
-
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var compress = require('compression');
@@ -9,8 +8,9 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var errorHandler = require('errorhandler');
-var csrf = require('lusca').csrf();
+var lusca = require('lusca');
 var methodOverride = require('method-override');
+var multer  = require('multer');
 
 var _ = require('lodash');
 var MongoStore = require('connect-mongo')(session);
@@ -24,7 +24,6 @@ var connectAssets = require('connect-assets');
 /**
  * Controllers (route handlers).
  */
-
 var homeController = require('./controllers/home');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
@@ -33,35 +32,25 @@ var contactController = require('./controllers/contact');
 /**
  * API keys and Passport configuration.
  */
-
 var secrets = require('./config/secrets');
 var passportConf = require('./config/passport');
 
 /**
  * Create Express server.
  */
-
 var app = express();
 
 /**
  * Connect to MongoDB.
  */
-
 mongoose.connect(secrets.db);
 mongoose.connection.on('error', function() {
   console.error('MongoDB Connection Error. Please make sure that MongoDB is running.');
 });
 
 /**
- * CSRF whitelist.
- */
-
-var csrfExclude = ['/url1', '/url2'];
-
-/**
  * Express configuration.
  */
-
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -72,6 +61,7 @@ app.use(connectAssets({
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(multer({ dest: path.join(__dirname, 'uploads') }));
 app.use(expressValidator());
 app.use(methodOverride());
 app.use(cookieParser());
@@ -79,28 +69,22 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: secrets.sessionSecret,
-  store: new MongoStore({ url: secrets.db, auto_reconnect: true })
+  store: new MongoStore({ url: secrets.db, autoReconnect: true })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+app.use(lusca({
+  csrf: true,
+  xframe: 'SAMEORIGIN',
+  xssProtection: true
+}));
 app.use(function(req, res, next) {
-  // CSRF protection.
-  if (_.contains(csrfExclude, req.path)) return next();
-  csrf(req, res, next);
-});
-app.use(function(req, res, next) {
-  // Make user object available in templates.
   res.locals.user = req.user;
   next();
 });
 app.use(function(req, res, next) {
-  // Remember original destination before login.
-  var path = req.path.split('/')[1];
-  if (/auth|login|logout|signup|fonts|favicon/i.test(path)) {
-    return next();
-  }
-  req.session.returnTo = req.path;
+  if (/api/i.test(req.path)) req.session.returnTo = req.path;
   next();
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
@@ -115,9 +99,8 @@ var Item = mongoose.model('Item', {
 
 
 /**
- * Main routes.
+ * Primary app routes.
  */
-
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
@@ -190,7 +173,6 @@ if (req.body.name === 'item') {
 /**
  * API examples routes.
  */
-
 app.get('/api', apiController.getApi);
 app.get('/api/lastfm', apiController.getLastfm);
 app.get('/api/nyt', apiController.getNewYorkTimes);
@@ -214,11 +196,15 @@ app.post('/api/venmo', passportConf.isAuthenticated, passportConf.isAuthorized, 
 app.get('/api/linkedin', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getLinkedin);
 app.get('/api/instagram', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getInstagram);
 app.get('/api/yahoo', apiController.getYahoo);
+app.get('/api/ordrin', apiController.getOrdrin);
+app.get('/api/paypal', apiController.getPayPal);
+app.get('/api/paypal/success', apiController.getPayPalSuccess);
+app.get('/api/paypal/cancel', apiController.getPayPalCancel);
+app.get('/api/lob', apiController.getLob);
 
 /**
- * OAuth sign-in routes.
+ * OAuth authentication routes. (Sign in)
  */
-
 app.get('/auth/instagram', passport.authenticate('instagram'));
 app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), function(req, res) {
   res.redirect(req.session.returnTo || '/');
@@ -245,9 +231,8 @@ app.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRe
 });
 
 /**
- * OAuth authorization routes for API examples.
+ * OAuth authorization routes. (API examples)
  */
-
 app.get('/auth/foursquare', passport.authorize('foursquare'));
 app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
   res.redirect('/api/foursquare');
@@ -262,9 +247,8 @@ app.get('/auth/venmo/callback', passport.authorize('venmo', { failureRedirect: '
 });
 
 /**
- * 500 Error Handler.
+ * Error Handler.
  */
-
 app.use(errorHandler());
 
 
@@ -285,7 +269,6 @@ var j = schedule.scheduleJob(rule, function(){
 /**
  * Start Express server.
  */
-
 app.listen(app.get('port'), function() {
   console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
