@@ -4,7 +4,7 @@ Hackathon Starter [![Dependency Status](https://david-dm.org/sahat/hackathon-sta
 
 **Live Demo**: http://hackathonstarter.herokuapp.com
 
-Jump to [What's new in 3.0.1?](#changelog)
+Jump to [What's new in 3.0.2?](#changelog)
 
 A boilerplate for **Node.js** web applications.
 
@@ -325,7 +325,7 @@ Project Structure
 | **public**/                        | Static assets (fonts, css, js, img).                        |
 | **public**/**js**/application.js   | Specify client-side JavaScript dependencies.                |
 | **public**/**js**/main.js          | Place your client-side JavaScript here.                     |
-| **public**/**css**/styles.less     | Main stylesheet for your app.                               |
+| **public**/**css**/main.less       | Main stylesheet for your app.                               |
 | **public/css/themes**/default.less | Some Bootstrap overrides to make it look prettier.          |
 | **views/account**/                 | Templates for *login, password reset, signup, profile*.     |
 | **views/api**/                     | Templates for API Examples.                                 |
@@ -457,7 +457,7 @@ Recommended Client-side Libraries
 Pro Tips
 --------
 
-- When installing an NPM package, add a *--save* flag, and it will be automatially
+- When installing an NPM package, add a *--save* flag, and it will be automatically
 added to `package.json` as well. For example, `npm install --save moment`.
 - Use [async.parallel()](https://github.com/caolan/async#parallel) when you need to run multiple
 asynchronous tasks, and then render a page, but only when all tasks are completed. For example, you might
@@ -571,16 +571,16 @@ download MongoDB [here](mongodb.org/downloads), or install it via a package mana
 Windows users, read [Install MongoDB on Windows](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/).
 
 **Tip:** If you are always connected to the internet, you could just use
-[MongoLab](https://mongolab.com/) or [MongoHQ](https://www.mongohq.com/) instead
+[MongoLab](https://mongolab.com/) or [Compose](https://www.compose.io/) instead
 of downloading and installing MongoDB locally. You will only need to update the
 `db` property in `config/secrets.js`.
 
 ### I get an error when I deploy my app, why?
-Chances are you haven't changed the *Dabatase URI* in `secrets.js`. If `db` is
+Chances are you haven't changed the *Database URI* in `secrets.js`. If `db` is
 set to `localhost`, it will only work on your machine as long as MongoDB is
 running. When you deploy to Heroku, OpenShift or some other provider, you will not have MongoDB
 running on `localhost`. You need to create an account with [MongoLab](http://mongolab.com)
-or [MongoHQ](http://mongohq.com), then create a free tier database.
+or [Compose](https://www.compose.io/), then create a free tier database.
 See [Deployment](#deployment) for more information on how to setup an account
 and a new database step-by-step with MongoLab.
 
@@ -846,21 +846,23 @@ Use whichever style that makes sense to you. Either one is acceptable. I really 
 `app.route` is very clean and elegant approach, but on the other hand I can no longer see all my routes at a glance
 when you have one route per line.
 
-**Step 2.** Create a new schema and a model `Book.js`.
+**Step 2.** Create a new schema and a model `Book.js` inside the *models* directory.
 ```js
 var bookSchema = new mongoose.Schema({
   name: String
 });
 
 var Book = mongoose.model('Book', bookSchema);
+module.exports = Book;
 ```
 
-**Step 3.** Create a new controller file called `book.js`.
+**Step 3.** Create a new controller file called `book.js` inside the *controllers* directory.
 ```js
 /**
  * GET /books
  * List all books.
  */
+var Book = require('../models/Book.js');
 
 exports.getBooks = function(req, res) {
   Book.find(function(err, docs) {
@@ -1121,7 +1123,7 @@ listed below.
 - Finally, in `secrets.js` instead of `db: 'localhost'`, use the following URI with your credentials:
  - `db: 'mongodb://USERNAME:PASSWORD@ds027479.mongolab.com:27479/DATABASE_NAME'`
 
-**Note:** As an alternative to MongoLab, there is also [MongoHQ](http://www.mongohq.com/home).
+**Note:** As an alternative to MongoLab, there is also [Compose](https://www.compose.io/).
 
 
 <img src="http://www.opencloudconf.com/images/openshift_logo.png" width="200">
@@ -1197,6 +1199,18 @@ Also, be sure to check out the [Jump-start your hackathon efforts with DevOps Se
 
 Changelog
 ---------
+
+### 3.0.2 (March 31, 2015)
+- Renamed `navbar.jade` to `header.jade`.
+- Fixed typos in README. Thanks @josephahn and @rstormsf. 
+- Fix radio button alignment on small screens in Profile page.
+- Increased `bcrypt.genSalt()` from **5** to **10**.
+- Updated package dependencies.
+- Updated Font Awesome `4.3.0`.
+- Updated Bootstrap `3.3.4`.
+- Removed Ionicons.
+- Removed unused `User` variable in *controllers/api.js*.
+- Removed Nodejitsu instructions from README.
 
 ### 3.0.1 (February 23, 2015)
 - Reverted Sass to LESS stylesheets. See <a href="https://github.com/sahat/hackathon-starter/issues/233">#233</a>.
@@ -1327,7 +1341,7 @@ Changelog
 There are have been over **500+** commits since the initial announcement in
 January 2014 and over a **120** issues and pull requests from **28** contributors.
 
-- Documention grew **8x** in size since the announcement on Hacker News
+- Documentation grew **8x** in size since the announcement on Hacker News
 - Upgraded to Express 4.0
 - Generator for adding/removing authentication providers
 - New Instagram authentication that can be added via generator
